@@ -7,37 +7,13 @@
         width: 600px;
        }
     </style>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="./js/mapping.js"></script>
+    <scipt src="./js/index.js"></script>
   </head>
   <body>
     <h3>India Well Mapping</h3>
     <div id="map"></div>
-    <script>
-      function initMap() {
-        var centralIndia = {lat: 22.597492, lng: 78.572716};
-        var madurai = {lat: 9.923726, lng: 78.119044}
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 4,
-          center: centralIndia
-        });
-        var marker = new google.maps.Marker({
-          position: madurai,
-          map: map
-        });
-
-        map.addListener('center_changed', function() {
-          // 3 seconds after the center of the map has changed, pan back to the
-          // marker.
-          window.setTimeout(function() {
-            map.panTo(marker.getPosition());
-          }, 3000);
-        });
-
-        marker.addListener('click', function() {
-          map.setZoom(8);
-          map.setCenter(marker.getPosition());
-        });
-      }
-    </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKqbWoJIsT2wjRf8pPhIgYdR8wcR3Lv0o&callback=initMap">
     </script>
