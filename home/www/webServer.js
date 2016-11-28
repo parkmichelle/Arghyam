@@ -10,17 +10,48 @@
  */
 
 /* jshint node: true */
+// var async = require('async');
+// var session = require('express-session');
+var bodyParser = require('body-parser');
 
-var express = require('express');
+// HTTP
 var http = require('http');
 var portno = 3000;   // Port number to use
+var fs = require('fs');
 
-var app = express();
 var data = require('./data.json');
+// app.use(session({secret: 'secretKey', resave: false, saveUninitialized: false}));
+
+
+// Express
+var express = require('express');
+var app = express();
+
+app.use(bodyParser.json());
 
 // We have the express static module (http://expressjs.com/en/starter/static-files.html) do all
 // the work for us.
 app.use(express.static(__dirname));
+
+app.get('/data/', function (request, response) {
+	response.status(200).send(JSON.stringify(data));
+});
+
+app.get('/data/:photo_id', function(request, response) {
+	var id = request.params.photo_id;
+	var imageFile = __dirname + "/img/wells/" + id;
+	console.log(imageFile);
+
+
+	try {
+    	fs.accessSync(imageFile, fs.F_OK);
+    	response.status(200).send('true');
+	} catch (e) {
+		console.log("HI");
+	    response.status(200).send('false');
+	}
+})
+
 
 var server = app.listen(portno, function () {
   var port = server.address().port;
