@@ -1,5 +1,6 @@
 function initMap() {
 
+  // Get data function for api calls to
   var getData = function(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = xhrHandler;
@@ -21,11 +22,9 @@ function initMap() {
 
 
   var data = {}
-
-  var centralIndia = {lat: 22.597492, lng: 78.572716};
-  var madurai = {lat: 9.923726, lng: 78.119044}
+  var centralIndia = {lat: 18.597492, lng: 78.572716};
   var map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 4,
+    zoom: 5,
     center: centralIndia
   });
   var styledMapType = new google.maps.StyledMapType(
@@ -250,6 +249,7 @@ function initMap() {
     map.mapTypes.set('styled_map', styledMapType);
     map.setMapTypeId('styled_map');
 
+    // Call for data and to create all markers on map
     getData('/data/', function(model){
       data = model;
       var funcs = [];
@@ -271,6 +271,8 @@ function initMap() {
           var image = data[i].Image;
           if (image != "") {
             image = "http://localhost:3000/img/wells/" + data[i].Image;
+          } else {
+            image = "http://localhost:3000/img/wells/noWell.png";
           }
           
           var latitude = data[i].Latitude;
@@ -288,6 +290,7 @@ function initMap() {
             potable = "Not reported";
           }
 
+          // HTML markup for infowindow format
           var contentString = '<div>'+
               '<div>'+
               '</div>'+
@@ -302,30 +305,34 @@ function initMap() {
               '<b>Water Level:</b> ' + waterLevel + '</br></br>' + 
               '<b>Date Posted:</b> ' + date + '</br>' + 
               '<b>Credit to:</b> ' + author + '</br></br>' +
-              '<img src=' + image + '></br>' +
+              '<img src=' + image + ' style="width: auto;height: 200px;margin: auto;display:block;"></br>' +
               '</p>'+
               '</div>'+
               '</div>';
 
+          // Pop up modal when you click on a marker on the map!
           var infowindow = new google.maps.InfoWindow({
             content: contentString,
-            maxWidth: 300
+            maxWidth: 400
           });
 
+          // close info window when another info window is open (NOT WORKING)
           infowindow.addListener('anotherClicked', function() {
             this.close();
           })
 
+          // Center on map when info window is closed
           google.maps.event.addListener(infowindow,'closeclick',function(){
              map.setCenter(centralIndia);
-             map.setZoom(4);
+             map.setZoom(5);
              // then, remove the infowindows name from the array
           });
 
+          // Close all info windows when user clicks on map (does not apply to dragging)
           map.addListener('click', function() {
             infowindow.close();
             map.setCenter(centralIndia);
-             map.setZoom(4);
+             map.setZoom(5);
           });
 
           marker.addListener('click', function() {
@@ -336,25 +343,32 @@ function initMap() {
       }
     })
 
-    // var marker = new google.maps.Marker({
-    //   position: madurai,
-    //   map: map,
-    //   mapTypeControlOptions: {
-    //     mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain',
-    //             'styled_map']
-    //   }
-    // });
+    // Polyfill Code - For india outline
+    var world_geometry = new google.maps.FusionTablesLayer({
+      query: {
+        select: 'geometry',
+        from: '1N2LBk4JHwWpOY4d9fobIn27lfnZ5MDy-NoqqRpk',
+        where: "ISO_2DIGIT IN ('IN')"
+      },
+      styles: [{
+        where: "ISO_2DIGIT IN ('IN')",
+        markerOptions: {
+          iconName: "supported_icon_name"
+        },
+        polygonOptions: {
+          fillColor: "#ffffff",
+          strokeColor: "#CD5C5C",
+          strokeWeight: "1",
+          fillOpacity: -1.0
+        },
+        polylineOptions: {
+          strokeColor: "#ffffff",
+          strokeWeight: "2000"  }
+      }, {
+        where: "ISO_2DIGIT IN ('IN')"
+      }],
+      map: map,
+      suppressInfoWindows: true
+    });
 
-    // map.addListener('center_changed', function() {
-    //   // 3 seconds after the center of the map has changed, pan back to the
-    //   // marker.
-    //   window.setTimeout(function() {
-    //     map.panTo(marker.getPosition());
-    //   }, 3000);
-    // });
-
-    // marker.addListener('click', function() {
-    //   map.setZoom(8);
-    //   map.setCenter(marker.getPosition());
-    // });
   }
