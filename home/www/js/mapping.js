@@ -22,7 +22,7 @@ function initMap() {
 
 
   var data = {}
-  var centralIndia = {lat: 18.597492, lng: 78.572716};
+  var centralIndia = {lat: 21.897492, lng: 78.572716};
   var map = new google.maps.Map(document.getElementById('map'), {
     zoom: 5,
     center: centralIndia
@@ -336,8 +336,11 @@ function initMap() {
           });
 
           marker.addListener('click', function() {
+            console.log(marker.position);
             map.setCenter(marker.getPosition());
+            map.setZoom(7);
             infowindow.open(map, marker);
+
           });
         }(i));
       }
