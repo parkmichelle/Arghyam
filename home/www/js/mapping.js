@@ -20,8 +20,28 @@ function initMap() {
     };
   }
 
+  var postData = function(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = xhrHandler;
+    xhr.open("POST", url);
+    xhr.send();  
+      
+    function xhrHandler(){  
+      // If we have an invalid state or status, log and return. 
+      if (this.readyState != 4 || this.status != 200) {
+        console.log("ERROR Status " + this.status + " state: " + this.readyState);
+        return;
+      }
+      
+      // Otherwise call callback with model
+      var model = JSON.parse(this.responseText);
+      callback(model);
+    };
+  }
+
 
   var data = {}
+  var currMarker = "none";
   var centralIndia = {lat: 21.897492, lng: 78.572716};
   var map = new google.maps.Map(document.getElementById('map'), {
     zoom: 5,
@@ -250,7 +270,7 @@ function initMap() {
     map.setMapTypeId('styled_map');
 
     // Call for data and to create all markers on map
-    getData('/data/', function(model){
+    getData('/newData/', function(model){
       data = model;
       var funcs = [];
       for (var i = 0; i < data.length; i++) {
@@ -312,28 +332,6 @@ function initMap() {
                 '</div>'+
               '</div>';
 
-          /*var contentString =
-              '<div class="infoBubble">'+
-                '<div class = firstBlock>' +
-                  '<h1 class="firstHeading">' + wellTitle + '</h1>'+
-                    '<p class="locationBlock">' + 
-                      '<b>City:</b> ' + city + ' ' +//'</br>' + 
-                      '<b>Latitude:</b> ' + latitude + ' ' +//'</br>' + 
-                      '<b>Longitude:</b> ' + longitude + ' ' +//'</br></br>' + 
-                    '</p>' +
-                '</div>' +
-                '<div class = secondBlock>' +
-                  '<p>' +
-                    '<img src=' + image + ' style="width: auto;height: 200px;margin: auto;display:block;"></br>' +
-                    '<b>Description:</b> ' + description + '</br>' + 
-                    '<b>Potable:</b> ' + potable + '</br>' + 
-                    '<b>Water Level:</b> ' + waterLevel + '</br></br>' + 
-                    '<b>Date Posted:</b> ' + date + '</br>' + 
-                    '<b>Credit to:</b> ' + author + '</br></br>' +
-                  '</p>'+
-                '</div>'+
-              '</div>';
-              */
 
           // Pop up modal when you click on a marker on the map!
           var infowindow = new google.maps.InfoWindow({
@@ -343,7 +341,7 @@ function initMap() {
 
           // close info window when another info window is open (NOT WORKING)
           infowindow.addListener('anotherClicked', function() {
-            this.close();
+            infowindow.close();
           })
 
           // Customize infowindow
@@ -409,10 +407,10 @@ function initMap() {
 
           marker.addListener('click', function() {
             console.log(marker.position);
+
             map.setCenter(marker.getPosition());
             map.setZoom(7);
             infowindow.open(map, marker);
-
           });
         }(i));
       }
