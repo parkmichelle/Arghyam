@@ -1,18 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="cs142App" ng-controller="MainController">
   <head>
     <link rel="stylesheet" type="text/css" href="http://localhost:3000/css/maps.css">
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    
+    <script src="./node_modules/angular/angular.js" type="text/javascript" ></script>
+    <link href="./bower_components/angular-material/angular-material.css" rel="stylesheet" />
+    <script src="./bower_components/angular-animate/angular-animate.js" type="text/javascript" ></script>
+    <script src="./bower_components/angular-aria/angular-aria.js" type="text/javascript" ></script>
+    <script src="./bower_components/angular-material/angular-material.js" type="text/javascript" ></script>
+
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.js"></script>
+
     <script src="./js/mapping.js"></script>
     <scipt src="./js/index.js"></script>
+    <script src="mainController.js"></script>
   </head>
   <body>
 
     <!-- Code for map -->
     <div id="map" style="width:100%">
     </div>
-    <img src="http://localhost:3000/img/wellLogo.png" class="btn" data-popup-open="popup-1" href="#" style="position:absolute;top:30px; right:30px;width:120px;height:auto;">  
+    <img src="http://localhost:3000/img/wellLogo.png" class="btn" data-popup-open="popup-1" href="#" style="position:absolute;top:20px; right:20px;width:105px;height:auto;" ng-click="click()">
+
+    <img src="http://localhost:3000/img/addWell.png" class="btn" data-popup-open="popup-2" href="#" style="position:absolute;top:145px; right:20px;width:105px;height:auto;" ng-click="click()">
+
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAKqbWoJIsT2wjRf8pPhIgYdR8wcR3Lv0o&callback=initMap">
     </script>
@@ -21,12 +35,65 @@
     <!-- Initially a hidden div that shows as a pop up -->
     <div class="popup" data-popup="popup-1">
       <div class="popup-inner">
-          <h2 style="text-align: center; font-family: ">About Us</h2>
+          <h2 style="text-align: center; font-family: Arial, Helvetica, sans-serif; ">About Us</h2>
           <p>We are a group of students out of Stanford University working in partnership with Arghyam, a water sustainability non-profit organization in India, to create a well-mapping application for open wells in India. Data is being pulled from volunteer sources as well as from the Facebook group "Open Wells of India and the World". <br><br>
 
           Want to submit a well location? Fill out the link <a href="https://stanforduniversity.qualtrics.com/jfe/form/SV_d110p3fGMCda2vX"> here<a>. </p> <br><br>
           <img src="http://localhost:3000/img/logo2.png" style="width: 75% height: auto;margin: auto;display:block;">  
           <a class="popup-close" data-popup-close="popup-1" href="#">x</a>
+      </div>
+    </div>
+
+    <div class="popup" data-popup="popup-2">
+      <div class="popup-inner">
+          <h2 style="text-align: center; font-family: Arial, Helvetica, sans-serif;">Add A Well!</h2>
+          <form class="form-style-7">
+            <ul>
+              <li>
+                  <label for="city">Nearest City to Well*</label>
+                  <input type="text" name="city" maxlength="100" ng-model="newCity" ng-required="true">
+                  <span>Enter nearest city to well.</span>
+              </li>
+              <li>
+                  <label for="latitude">Latitude*</label>
+                  <input type="number" min="-90" max="90" name="latitude" step="any" maxlength="100" ng-model="newLat" ng-required="true">
+                  <span>Latitude coordinate of the well you are citing.</span>
+              </li>
+              <li>
+                  <label for="longitude">Longitude*</label>
+                  <input type="number" min="-180" max="180" name="longitude" step="any" maxlength="100" ng-model="newLong" ng-required="true">
+                  <span>Longitude coordinate of the well you are citing.</span>
+              </li>
+              <li>
+                  <label for="description">Description</label>
+                  <textarea name="description" onkeyup="angular.element(this).scope().adjust_textarea(this)" ng-model="newDescription"></textarea>
+                  <span>Description of Well</span>
+              </li>
+              <li>
+                  <label for="water">Water Level</label>
+                  <input type="text" name="water" maxlength="100" ng-model="newWater">
+                  <span>Describe the water level of the well.</span>
+              </li>
+              <li>
+                  <label for="potable">Potable</label>
+                  <input type="text" name="potable" maxlength="100" ng-model="newPotable">
+                  <span>How easy is it to pot water from the well?</span>
+              </li>
+              <li>
+                <label for="name">Your Name (Optional)</label>
+                <input type="text" name="name" maxlength="100" ng-model="newName">
+                <span>Enter your name here if you want credit for logging this well.</span>
+              </li>
+              <li>
+                <label for="name">Upload a photo of well</label>
+                <input id = "addPic" type="file" accept="image/*" style="margin-top: 10px"onchange="angular.element(this).scope().inputFileNameChanged(this)">
+              </li>
+              <li>
+                  <input type="submit" value="Send This" ng-click = "submitWell()">
+              </li>
+            </ul>
+          </form>  
+          <a class="popup-close" data-popup-close="popup-2" href="#">x</a>
       </div>
     </div>
 

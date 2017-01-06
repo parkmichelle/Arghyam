@@ -1,0 +1,257 @@
+'use strict';
+
+var cs142App = angular.module('cs142App', ['ngRoute', 'ngMaterial', 'ngResource']);
+
+cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$http', '$routeParams', '$resource', '$mdDialog', '$mdMedia',
+    function ($scope, $rootScope, $location, $http, $routeParams, $resource, $mdDialog, $mdMedia) {
+        
+        /*
+  		 *   FetchModel - Fetch a model from the web server.
+  		 *   url - string - The URL to issue the GET request.
+  		 *   doneCallback - function - called with argument (model) when the
+  		 *   the GET request is done. The argument model is the object
+  		 *   containing the model. model is undefined in the error case.
+  		 */
+ 		$scope.FetchModel = function(url, callback) {
+			
+			// Create XMLHttpRequest and assign handler
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = xhrHandler;
+			xhr.open("GET", url);
+  			xhr.send();
+  			
+  			
+			function xhrHandler(){	
+				// If we have an invalid state or status, log and return. 
+				if (this.readyState != 4 || this.status != 200) {
+ 					console.log("ERROR Status " + this.status + " state: " + this.readyState);
+ 					return;
+ 				}
+ 				
+ 				// Otherwise call callback with model
+ 				var model = JSON.parse(this.responseText);
+ 				callback(model);
+			};
+ 		};
+
+    $scope.data = {};
+
+    // Load initial data - if mongodb doesn't match data.json, we scrap mongodb and recreate it.
+    $scope.loadData = function() {
+      $scope.FetchModel('/firstData/', function(dbCount){
+        if (dbCount[0] == dbCount[1]) {
+          return
+        } else {
+          $scope.FetchModel('/data/', function(model) {
+            var data = model;
+            var funcs = [];
+            for (var i = 0; i < data.length; i++) {
+              funcs[i] = (function (i) {
+                var currentReq = $resource('/entry');
+                var currWaterLevel = data[i].Water;
+                var currPotable = data[i].Potable;
+                if (currWaterLevel == null) {
+                  currWaterLevel = "Not reported";
+                }
+                if (currPotable == null) {
+                  currPotable = "Not reported";
+                }
+
+                var currImage = data[i].Image;
+                if (currImage != "") {
+                  currImage = "http://localhost:3000/img/wells/" + data[i].Image;
+                } else {
+                  currImage = "http://localhost:3000/img/wells/noWell.png";
+                }
+                currentReq.save({
+                  city: data[i].City, 
+                  longitude: data[i].Longitude, 
+                  latitude: data[i].Latitude, 
+                  description: data[i].Description, 
+                  imageUrl: currImage,
+                  imageName: data[i].Image,
+                  author: data[i].Person,
+                  potable: currPotable,
+                  date: data[i].Time,
+                  water: currWaterLevel,
+                  source: "initial"
+                }, function(ret) {
+                  console.log("Done");
+                });
+              }(i));
+            }
+          })
+        }
+      });
+    }
+
+    $scope.loadData();
+
+    $scope.newCity = "";
+    $scope.newLat = 0.0;
+    $scope.newLong = 0.0;
+    $scope.newDescription = "";
+    $scope.newWater = "";
+    $scope.newPotable = "";
+    $scope.newName = "";
+    var selectedPhotoFile;   // Holds the last file selected by the user
+
+    // Called on file selection - we simply save a reference to the file in selectedPhotoFile
+    $scope.inputFileNameChanged = function (element) {
+        selectedPhotoFile = element.files[0];
+        console.log(selectedPhotoFile);
+    };
+
+    // Has the user selected a file?
+    $scope.inputFileNameSelected = function () {
+        return !!selectedPhotoFile;
+    };
+
+    // Upload the photo file selected by the user using a post request to the URL /photos/new
+    $scope.uploadPhoto = function() {
+      if (!$scope.inputFileNameSelected()) {
+          console.error("uploadPhoto called will no selected file");
+          return "";
+      }
+      var domForm = new FormData();
+      domForm.append('uploadedphoto', selectedPhotoFile);
+
+      // Using $http to POST the form
+      $http.post('/photos/new', domForm, {
+        transformRequest: angular.identity,
+        headers: {'Content-Type': undefined}
+      }).then(function(model){
+        console.log(model);
+        var currentReq = $resource('/entry');
+        var currWaterLevel = $scope.newWater;
+        var currPotable = $scope.newPotable;
+        var currDescription = $scope.newDescription;
+        var currAuthor = $scope.newName;
+        if (currAuthor == "") {
+          currAuthor = "Anonymous";
+        }
+        if (currDescription == "") {
+          currDescription = "Not available";
+        }
+        if (currWaterLevel == "") {
+          currWaterLevel = "Not reported";
+        }
+        if (currPotable == "") {
+          currPotable = "Not reported";
+        }
+
+        var currDate = $scope.getDate();
+        var currImage = "http://localhost:3000/img/wells/" + model.data;
+        currentReq.save({
+          city: $scope.newCity,
+          longitude: $scope.newLong, 
+          latitude: $scope.newLat, 
+          description: currDescription, 
+          imageUrl: currImage,
+          imageName: model.data,
+          author: currAuthor,
+          potable: currPotable,
+          date: currDate,
+          water: currWaterLevel,
+          source: "form"
+        }, function(ret) {
+          $scope.loadData();
+          console.log("Done");
+        });
+      });
+      console.log('fileSubmitted', selectedPhotoFile);  
+    };
+
+    $scope.getDate = function() {
+      var today = new Date();
+      var dd = today.getDate();
+      var mm = today.getMonth()+1; //January is 0!
+      var yyyy = today.getFullYear();
+
+      if(dd<10) {
+          dd='0'+dd
+      }
+
+      if (mm == 0) {
+        mm = "January"
+      } else if (mm == 1) {
+        mm = "February"
+      } else if (mm == 2) {
+        mm = "March"
+      } else if (mm == 3) {
+        mm = "April"
+      } else if (mm == 4) {
+        mm = "May"
+      } else if (mm == 5) {
+        mm = "June"
+      } else if (mm == 6) {
+        mm = "July"
+      } else if (mm == 7) {
+        mm = "August"
+      } else if (mm == 8) {
+        mm = "September"
+      } else if (mm == 9) {
+        mm = "October"
+      } else if (mm == 10) {
+        mm = "November"
+      } else {
+        mm = "December"
+      }
+
+      today = dd + '-' + mm+'-'+yyyy;
+      return today;
+    }
+
+    $scope.adjust_textarea = function(h) {
+        h.style.height = "20px";
+        h.style.height = (h.scrollHeight)+"px";
+    }
+    
+    // when the Save button is pressed, we send the selected file to the server and save it as a new photo.
+    $scope.submitWell = function(arr) {
+    
+      // Create a DOM form and add the file to it under the name uploadedphoto
+      if ($scope.inputFileNameSelected()) {
+        $scope.uploadPhoto();
+        return;
+      }
+      var currentReq = $resource('/entry');
+      var currWaterLevel = $scope.newWater;
+      var currPotable = $scope.newPotable;
+      var currDescription = $scope.newDescription;
+      var currAuthor = $scope.newName;
+      if (currAuthor == "") {
+        currAuthor = "Anonymous";
+      }
+      if (currDescription == "") {
+        currDescription = "Not available";
+      }
+      if (currWaterLevel == "") {
+        currWaterLevel = "Not reported";
+      }
+      if (currPotable == "") {
+        currPotable = "Not reported";
+      }
+
+      var currDate = $scope.getDate();
+
+      currentReq.save({
+        city: $scope.newCity,
+        longitude: $scope.newLong, 
+        latitude: $scope.newLat, 
+        description: currDescription, 
+        imageUrl: "http://localhost:3000/img/wells/noWell.png",
+        imageName: "",
+        author: currAuthor,
+        potable: currPotable,
+        date: currDate,
+        water: currWaterLevel,
+        source: "form"
+      }, function(ret) {
+        $scope.loadData();
+        console.log("Done");
+      });
+    };
+        
+  }]);
+
