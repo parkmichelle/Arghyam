@@ -6,7 +6,7 @@
 
 var mongoose = require('mongoose');
 
-// create a schema
+// Entry Scheme used in webServer.js
 var entrySchema = new mongoose.Schema({
 	id: String,
 	author: String,
@@ -21,8 +21,7 @@ var entrySchema = new mongoose.Schema({
 	photoFile: String
 });
 
-// the schema is useless so far
-// we need to create a model using it
+// Create model for schema
 var Entry = mongoose.model('Entry', entrySchema);
 
 // make this available to our users in our Node applications
