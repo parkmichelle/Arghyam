@@ -86,6 +86,172 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
     }
 
     $scope.loadData();
+
+    $scope.newCity = "";
+    $scope.newLat = 0.0;
+    $scope.newLong = 0.0;
+    $scope.newDescription = "";
+    $scope.newWater = "";
+    $scope.newPotable = "";
+    $scope.newName = "";
+    var selectedPhotoFile;   // Holds the last file selected by the user
+
+    // Called on file selection - we simply save a reference to the file in selectedPhotoFile
+    $scope.inputFileNameChanged = function (element) {
+        selectedPhotoFile = element.files[0];
+        console.log(selectedPhotoFile);
+    };
+
+    // Has the user selected a file?
+    $scope.inputFileNameSelected = function () {
+        return !!selectedPhotoFile;
+    };
+
+    // Upload the photo file selected by the user using a post request to the URL /photos/new
+    $scope.uploadPhoto = function() {
+      if (!$scope.inputFileNameSelected()) {
+          console.error("uploadPhoto called will no selected file");
+          return "";
+      }
+      var domForm = new FormData();
+      domForm.append('uploadedphoto', selectedPhotoFile);
+
+      // Using $http to POST the form
+      $http.post('/photos/new', domForm, {
+        transformRequest: angular.identity,
+        headers: {'Content-Type': undefined}
+      }).then(function(model){
+        console.log(model);
+        var currentReq = $resource('/entry');
+        var currWaterLevel = $scope.newWater;
+        var currPotable = $scope.newPotable;
+        var currDescription = $scope.newDescription;
+        var currAuthor = $scope.newName;
+        if (currAuthor == "") {
+          currAuthor = "Anonymous";
+        }
+        if (currDescription == "") {
+          currDescription = "Not available";
+        }
+        if (currWaterLevel == "") {
+          currWaterLevel = "Not reported";
+        }
+        if (currPotable == "") {
+          currPotable = "Not reported";
+        }
+
+        var currDate = $scope.getDate();
+        var currImage = "http://localhost:3000/img/wells/" + model.data;
+        currentReq.save({
+          city: $scope.newCity,
+          longitude: $scope.newLong, 
+          latitude: $scope.newLat, 
+          description: currDescription, 
+          imageUrl: currImage,
+          imageName: model.data,
+          author: currAuthor,
+          potable: currPotable,
+          date: currDate,
+          water: currWaterLevel,
+          source: "form"
+        }, function(ret) {
+          $scope.loadData();
+          console.log("Done");
+        });
+      });
+      console.log('fileSubmitted', selectedPhotoFile);  
+    };
+
+    $scope.getDate = function() {
+      var today = new Date();
+      var dd = today.getDate();
+      var mm = today.getMonth()+1; //January is 0!
+      var yyyy = today.getFullYear();
+
+      if(dd<10) {
+          dd='0'+dd
+      }
+
+      if (mm == 0) {
+        mm = "January"
+      } else if (mm == 1) {
+        mm = "February"
+      } else if (mm == 2) {
+        mm = "March"
+      } else if (mm == 3) {
+        mm = "April"
+      } else if (mm == 4) {
+        mm = "May"
+      } else if (mm == 5) {
+        mm = "June"
+      } else if (mm == 6) {
+        mm = "July"
+      } else if (mm == 7) {
+        mm = "August"
+      } else if (mm == 8) {
+        mm = "September"
+      } else if (mm == 9) {
+        mm = "October"
+      } else if (mm == 10) {
+        mm = "November"
+      } else {
+        mm = "December"
+      }
+
+      today = dd + '-' + mm+'-'+yyyy;
+      return today;
+    }
+
+    $scope.adjust_textarea = function(h) {
+        h.style.height = "20px";
+        h.style.height = (h.scrollHeight)+"px";
+    }
+    
+    // when the Save button is pressed, we send the selected file to the server and save it as a new photo.
+    $scope.submitWell = function(arr) {
+    
+      // Create a DOM form and add the file to it under the name uploadedphoto
+      if ($scope.inputFileNameSelected()) {
+        $scope.uploadPhoto();
+        return;
+      }
+      var currentReq = $resource('/entry');
+      var currWaterLevel = $scope.newWater;
+      var currPotable = $scope.newPotable;
+      var currDescription = $scope.newDescription;
+      var currAuthor = $scope.newName;
+      if (currAuthor == "") {
+        currAuthor = "Anonymous";
+      }
+      if (currDescription == "") {
+        currDescription = "Not available";
+      }
+      if (currWaterLevel == "") {
+        currWaterLevel = "Not reported";
+      }
+      if (currPotable == "") {
+        currPotable = "Not reported";
+      }
+
+      var currDate = $scope.getDate();
+
+      currentReq.save({
+        city: $scope.newCity,
+        longitude: $scope.newLong, 
+        latitude: $scope.newLat, 
+        description: currDescription, 
+        imageUrl: "http://localhost:3000/img/wells/noWell.png",
+        imageName: "",
+        author: currAuthor,
+        potable: currPotable,
+        date: currDate,
+        water: currWaterLevel,
+        source: "form"
+      }, function(ret) {
+        $scope.loadData();
+        console.log("Done");
+      });
+    };
         
   }]);
 

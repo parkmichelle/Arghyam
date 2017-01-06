@@ -122,72 +122,101 @@ app.post('/entry', function(request, response) {
 	var date = request.body.date;
 	var water = request.body.water;
 	
-	// Check if login credentials already exist
-	Entry.findOne({photoFile: "afadsfaasdsd"}, function (err, user) { 
-		// If not, create new User
-    	if (!err && long != null && lat != null) {
-    		if (city == null) {
-    			city = "Not available";
-    		}
-    		if (description == null) {
-    			description = "Not available";
-    		}
-    		if (author == null) {
-    			author = "Anonymous"
-    		}
-    		if (date == null) {
-    			date = "Not available"
-    		}
-    		Entry.create({
-            	author: author,
-            	date: date,
-            	city: city,
-            	lat: lat,
-            	long: long,
-            	description: description,
-            	water: water,
-            	potable: potable,
-            	photoFile: image
-        	}, function (err, userObj) {
-            	if (err) {
-                	console.error('Error create user', err);
-            	} else {
-                	// Set the unique ID of the object.
-                	userObj.id = userObj._id;
-                	userObj.save();
-                	if (response.body.source == "form") {
-                		// Write to file
-                		newPost = data.length + 1;
-                		data.push({
-                			"Post": newPost,
-                			"Person": author,
-                			"Time": date,
-                			"City": city,
-                			"Latitude": lat,
-                			"Longitude": long,
-                			"Description": description,
-                			"Water": water,
-                			"Potable": potable,
-                			"Image": response.body.imageName
-                		})
-                		fs.writeFile('./data.json', JSON.stringify(data), 'utf8', function(err) {
-                			if (err) {
-                				return console.log(err);
-                			} else {
-                				console.log("file saved to data.json");
-                			}
-                		});
-                	}
-                	response.end("Complete Registration");
+	// If not, create new User
+	if (long != null && lat != null) {
+		if (city == null) {
+			city = "Not available";
+		}
+		if (description == null) {
+			description = "Not available";
+		}
+		if (author == null) {
+			author = "Anonymous"
+		}
+		if (date == null) {
+			date = "Not available"
+		}
+		Entry.create({
+        	author: author,
+        	date: date,
+        	city: city,
+        	lat: lat,
+        	long: long,
+        	description: description,
+        	water: water,
+        	potable: potable,
+        	photoFile: image
+    	}, function (err, userObj) {
+        	if (err) {
+            	console.error('Error create user', err);
+        	} else {
+            	// Set the unique ID of the object.
+            	userObj.id = userObj._id;
+            	userObj.save();
+            	if (request.body.source == "form") {
+            		// Write to file
+            		var newPost = data.length + 1;
+            		data.push({
+            			"Post": newPost,
+            			"Person": author,
+            			"Time": date,
+            			"City": city,
+            			"Latitude": lat,
+            			"Longitude": long,
+            			"Description": description,
+            			"Water": water,
+            			"Potable": potable,
+            			"Image": request.body.imageName
+            		})
+            		fs.writeFile('./data.json', JSON.stringify(data), 'utf8', function(err) {
+            			if (err) {
+            				return console.log(err);
+            			} else {
+            				console.log("file saved to data.json");
+            			}
+            		});
             	}
-        	});
-        	
-        // Error Handling 
-    	} else if (long == null || lat == null) {
-			response.status(400).send("Must provide longitude and latitude!");    	  	
-    	} else {
-    		response.status(400).send("Error!");
-    	}
+            	response.end("Complete Registration");
+        	}
+    	});
+    	
+    // Error Handling 
+	} else if (long == null || lat == null) {
+		response.status(400).send("Must provide longitude and latitude!");    	  	
+	} else {
+		response.status(400).send("Error!");
+	}
+});
+
+/*
+ * POST /photos/new - Add new photo
+ */
+app.post('/photos/new', function (request, response) {
+	
+	processFormBody(request, response, function (err) {
+        if (err || !request.file) {
+            response.status(400).send("Photo Upload Error"); 
+            return;
+        }
+        // request.file has the following properties of interest
+        //      fieldname      - Should be 'uploadedphoto' since that is what we sent
+        //      originalname:  - The name of the file the user uploaded
+        //      mimetype:      - The mimetype of the image (e.g. 'image/jpeg',  'image/png')
+        //      buffer:        - A node Buffer containing the contents of the file
+        //      size:          - The size of the file in bytes
+
+        // We need to create the file in the directory "images" under an unique name. We make
+        // the original file name unique by adding a unique prefix with a timestamp.
+        var timestamp = new Date().valueOf();
+        var filename = 'U' +  String(timestamp) + request.file.originalname;
+		
+        fs.writeFile("./img/wells/" + filename, request.file.buffer, function (err) {
+          if (err) {
+          	response.status(400).send("Photo Error");
+          } else {
+          	response.end(filename)
+          }
+        });
     });
 });
 
