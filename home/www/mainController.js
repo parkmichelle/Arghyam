@@ -96,10 +96,10 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
     $scope.loadData();    // Call loadData upon loading page.
 
     // Form variable bindings (for when user Adds a Well)
-    $scope.newCity = "";
-    $scope.newCountry = "";
-    $scope.newLat = 0.0;
-    $scope.newLong = 0.0;
+    $scope.newCity;
+    $scope.newCountry;
+    $scope.newLat;
+    $scope.newLong;
     $scope.newDescription = "";
     $scope.newWater = "";
     $scope.newPotable = "";
@@ -187,27 +187,27 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
           dd='0'+dd
       }
 
-      if (mm == 0) {
+      if (mm == 1) {
         mm = "January"
-      } else if (mm == 1) {
-        mm = "February"
       } else if (mm == 2) {
-        mm = "March"
+        mm = "February"
       } else if (mm == 3) {
-        mm = "April"
+        mm = "March"
       } else if (mm == 4) {
-        mm = "May"
+        mm = "April"
       } else if (mm == 5) {
-        mm = "June"
+        mm = "May"
       } else if (mm == 6) {
-        mm = "July"
+        mm = "June"
       } else if (mm == 7) {
-        mm = "August"
+        mm = "July"
       } else if (mm == 8) {
-        mm = "September"
+        mm = "August"
       } else if (mm == 9) {
-        mm = "October"
+        mm = "September"
       } else if (mm == 10) {
+        mm = "October"
+      } else if (mm == 11) {
         mm = "November"
       } else {
         mm = "December"
@@ -227,7 +227,10 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
     
     // when the Save button is pressed, we send the selected file to the server and save it as a new entry.
     $scope.submitWell = function(arr) {
-    
+      if (!$scope.newCity || !$scope.newCountry || !$scope.newLat || !$scope.newLong) {
+        return;
+      }
+
       // If a photo is selected, we call uploadPhoto() to submit an Entry with a photo
       if ($scope.inputFileNameSelected()) {
         $scope.uploadPhoto();
@@ -275,7 +278,7 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
         console.log("Done");
       });
       document.getElementById("addWellPopup").innerHTML = "Thank you! Your well has been added!";
-      setTimeout(function () { location.reload(true); }, 1500);
+      setTimeout(function () { location.reload(true); }, 15000);
     };
         
   }]);
