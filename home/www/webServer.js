@@ -96,7 +96,6 @@ app.get('/data/:photo_id', function(request, response) {
 	var imageFile = __dirname + "/img/wells/" + id;
 	console.log(imageFile);
 
-
 	try {
     	fs.accessSync(imageFile, fs.F_OK);
     	response.status(200).send('true');
@@ -113,6 +112,7 @@ app.post('/entry', function(request, response) {
 
 	// Get body parameters
 	var city = request.body.city;
+	var country = request.body.country;
 	var long = request.body.longitude;
 	var lat = request.body.latitude;
 	var description = request.body.description;
@@ -140,6 +140,7 @@ app.post('/entry', function(request, response) {
         	author: author,
         	date: date,
         	city: city,
+        	country: country,
         	lat: lat,
         	long: long,
         	description: description,
@@ -155,12 +156,13 @@ app.post('/entry', function(request, response) {
             	userObj.save();
             	if (request.body.source == "form") {
             		// Write to file
-            		var newPost = data.length + 1;
+            		var newPost = userObj.id;
             		data.push({
             			"Post": newPost,
             			"Person": author,
             			"Time": date,
             			"City": city,
+            			"Country": country,
             			"Latitude": lat,
             			"Longitude": long,
             			"Description": description,

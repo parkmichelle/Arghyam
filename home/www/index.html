@@ -45,7 +45,7 @@
     </div>
 
     <div class="popup" data-popup="popup-2">
-      <div class="popup-inner">
+      <div id="addWellPopup" class="popup-inner">
           <h2 style="text-align: center; font-family: Arial, Helvetica, sans-serif;">Add A Well!</h2>
           <form class="form-style-7">
             <ul>
@@ -53,6 +53,11 @@
                   <label for="city">Nearest City to Well*</label>
                   <input type="text" name="city" maxlength="100" ng-model="newCity" ng-required="true">
                   <span>Enter nearest city to well.</span>
+              </li>
+              <li>
+                  <label for="country">Country*</label>
+                  <input type="text" name="country" maxlength="100" ng-model="newCountry" ng-required="true">
+                  <span>Country the well is in.</span>
               </li>
               <li>
                   <label for="latitude">Latitude*</label>

@@ -12,6 +12,7 @@ var entrySchema = new mongoose.Schema({
 	author: String,
 	date: String,
 	city: String,
+	country: String,
 	lat: Number,
 	long: Number,
 	description: String,
