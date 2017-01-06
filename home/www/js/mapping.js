@@ -1,6 +1,10 @@
+// Called at load to initialize map
 function initMap() {
-  // google.maps.event.addDomListener(window, 'load', initialize);
-  // Get data function for api calls to
+
+  /* getData():
+   * REST API helper for making GET calls to node.js server
+   * "url" should match a url from webServer.js
+   */
   var getData = function(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = xhrHandler;
@@ -20,6 +24,10 @@ function initMap() {
     };
   }
 
+  /* postData():
+   * REST API helper for making POST calls to node.js server
+   * "url" should match a url from webServer.js
+   */
   var postData = function(url, callback) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = xhrHandler;
@@ -40,9 +48,10 @@ function initMap() {
   }
 
 
-  var data = {}
-  var currMarker = "none";
-  var centralIndia = {lat: 21.897492, lng: 78.572716};
+  var data = {} // data object used to store data when retrieved from server.
+  var centralIndia = {lat: 21.897492, lng: 78.572716};  // Center point for map
+
+  // initialize map and styling.
   var map = new google.maps.Map(document.getElementById('map'), {
     zoom: 5,
     center: centralIndia
@@ -273,6 +282,8 @@ function initMap() {
     getData('/newData/', function(model){
       data = model;
       var funcs = [];
+
+      // Create a marker on the map for each entry in data.json
       for (var i = 0; i < data.length; i++) {
         funcs[i] = (function (i) {
           var wellTitle = "Well in " + data[i].City;
@@ -286,6 +297,7 @@ function initMap() {
             }
           });
 
+          // Parameter handling!
           var city = data[i].City;
           var description = data[i].Description;
           var image = data[i].Image;
@@ -340,7 +352,7 @@ function initMap() {
             maxWidth: 350,
           });
 
-          // close info window when another info window is open (NOT WORKING)
+          // close info window when another info window is open (NOT WORKING - doesn't really matter)
           infowindow.addListener('anotherClicked', function() {
             infowindow.close();
           })

@@ -14,9 +14,10 @@
     <script src="bower_components/angular-route/angular-route.js"></script>
     <script src="bower_components/angular-resource/angular-resource.js"></script>
 
+    
+    <script src="mainController.js"></script>
     <script src="./js/mapping.js"></script>
     <scipt src="./js/index.js"></script>
-    <script src="mainController.js"></script>
   </head>
   <body>
 
@@ -109,7 +110,6 @@
         $('[data-popup-open]').on('click', function(e)  {
           var targeted_popup_class = jQuery(this).attr('data-popup-open');
           $('[data-popup="' + targeted_popup_class + '"]').fadeIn(350);
-          console.log("HIHIHI");
           e.preventDefault();
         });
 

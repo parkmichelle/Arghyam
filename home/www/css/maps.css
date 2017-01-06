@@ -2,7 +2,7 @@
 @import url(//fonts.googleapis.com/css?family=Quattrocento+Sans:normal,bold);
 @import url(//fonts.googleapis.com/css?family=Lato:normal,bold);
 
-
+/* CSS for full screen map sizing */
 #map {
   height: 100%;
   width: 100%;
@@ -10,6 +10,7 @@
   min-height: 100%; 
 }
 
+/* CSS for About Us and Add Well pop-ups */
 .popup {
   width:100%;
   height:100%;
@@ -36,6 +37,7 @@
   font-family: "Tahoma", Geneva, sans-serif;
 }
 
+/* CSS for Well Pop-ups */
 .infoBubble {
   width: 350px !important;
   background-color: #FFFFFF;
@@ -86,6 +88,7 @@
 .btn:hover {
   box-shadow: inset 0 0 100px 100px rgba(178,34,34, 0.8);
 }
+
 /* Close Button */
 .popup-close {
   width:30px;
@@ -114,6 +117,7 @@
   text-decoration:none;
 }
 
+/* CSS for form in Add Well Pop-up */
 .form-style-7{
     /*max-width:400px;*/
     margin:20px auto;
