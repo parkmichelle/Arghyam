@@ -65,6 +65,7 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
                 }
                 currentReq.save({
                   city: data[i].City, 
+                  country: data[i].Country,
                   longitude: data[i].Longitude, 
                   latitude: data[i].Latitude, 
                   description: data[i].Description, 
@@ -88,6 +89,7 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
     $scope.loadData();
 
     $scope.newCity = "";
+    $scope.newCountry = "";
     $scope.newLat = 0.0;
     $scope.newLong = 0.0;
     $scope.newDescription = "";
@@ -144,6 +146,7 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
         var currImage = "http://localhost:3000/img/wells/" + model.data;
         currentReq.save({
           city: $scope.newCity,
+          country: $scope.newCountry,
           longitude: $scope.newLong, 
           latitude: $scope.newLat, 
           description: currDescription, 
@@ -213,6 +216,8 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
       // Create a DOM form and add the file to it under the name uploadedphoto
       if ($scope.inputFileNameSelected()) {
         $scope.uploadPhoto();
+        document.getElementById("addWellPopup").innerHTML = "Thank you! Your well has been added!";
+        setTimeout(function () { location.reload(true); }, 1500);
         return;
       }
       var currentReq = $resource('/entry');
@@ -237,6 +242,7 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
 
       currentReq.save({
         city: $scope.newCity,
+        country: $scope.newCountry,
         longitude: $scope.newLong, 
         latitude: $scope.newLat, 
         description: currDescription, 
@@ -251,6 +257,8 @@ cs142App.controller('MainController', ['$scope', '$rootScope', '$location', '$ht
         $scope.loadData();
         console.log("Done");
       });
+      document.getElementById("addWellPopup").innerHTML = "Thank you! Your well has been added!";
+      setTimeout(function () { location.reload(true); }, 1500);
     };
         
   }]);

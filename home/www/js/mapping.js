@@ -301,6 +301,7 @@ function initMap() {
           var potable = data[i].Potable;
           var date = data[i].Time;
           var waterLevel = data[i].Water;
+          var country = data[i].Country;
 
           if (waterLevel == null) {
             waterLevel = "Not reported";
@@ -316,7 +317,7 @@ function initMap() {
                 '<div class = firstBlock>' +
                   '<h1 class="firstHeading">' + wellTitle + '</h1>'+
                     '<p class="locationBlock">' + 
-                      city + ', India' + '   |   ' +
+                      city + ', ' + country + '   |   ' +
                       latitude + ', ' + longitude +
                     '</p>' +
                 '</div>' +
